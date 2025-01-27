@@ -56,18 +56,24 @@
     <div class="container">
         <h1>Emerson's Bolus Calculator</h1>
         <div class="form-group">
-            <label for="currentBG">Current BG (mg/dL)</label>
-            <input type="number" id="currentBG" min="0" max="800" required>
+            <label for="currentBloodGlucose">Current Blood Glucose (mg/dL)</label>
+            <input type="number" id="currentBloodGlucose" min="0" max="800" required>
         </div>
         <div class="form-group">
             <label for="carbs">Carbs in Meal (grams)</label>
             <input type="number" id="carbs" min="0" required>
         </div>
         <div class="form-group">
-            <label for="targetBG">Target BG</label>
-            <select id="targetBG">
-                <option value="120">Normal (120 mg/dL)</option>
-                <option value="170">Pre-Sport (170 mg/dL)</option>
+            <label for="targetBloodGlucose">Target Blood Glucose (mg/dL)</label>
+            <select id="targetBloodGlucose">
+                <script>
+                    for (let i = 90; i <= 230; i += 10) {
+                        let note = '';
+                        if (i === 120) note = ' (normal meals)';
+                        if (i === 170) note = ' (pre-swimming)';
+                        document.write(`<option value="${i}" ${i === 120 ? 'selected' : ''}>${i} mg/dL${note}</option>`);
+                    }
+                </script>
             </select>
         </div>
         <div class="form-group">
@@ -96,23 +102,23 @@
 
     <script>
         function calculateBolus() {
-            const currentBG = parseFloat(document.getElementById('currentBG').value);
+            const currentBloodGlucose = parseFloat(document.getElementById('currentBloodGlucose').value);
             const carbs = parseFloat(document.getElementById('carbs').value);
-            const targetBG = parseFloat(document.getElementById('targetBG').value);
+            const targetBloodGlucose = parseFloat(document.getElementById('targetBloodGlucose').value);
             const cf = parseFloat(document.getElementById('cf').value);
             const icr = parseFloat(document.getElementById('icr').value);
 
-            if (isNaN(currentBG) || isNaN(carbs)) {
-                document.getElementById('result').innerText = 'Please enter valid values for Current BG and Carbs.';
+            if (isNaN(currentBloodGlucose) || isNaN(carbs)) {
+                document.getElementById('result').innerText = 'Please enter valid values for Current Blood Glucose and Carbs.';
                 return;
             }
 
             const carbBolus = carbs / icr;
-            const correctionBolus = cf > 0 ? (currentBG - targetBG) / cf : 0;
+            const correctionBolus = cf > 0 ? (currentBloodGlucose - targetBloodGlucose) / cf : 0;
             const totalBolus = carbBolus + correctionBolus;
             const roundedBolus = Math.round(totalBolus * 2) / 2;
 
-            if ((totalBolus <= 0) && (currentBG <= 70)) {
+            if ((totalBolus <= 0) && (currentBloodGlucose <= 70)) {
                 document.getElementById('result').innerText = 'NO BOLUS NEEDED. EAT CARBS IMMEDIATELY!';
             } else {
                 document.getElementById('result').innerText = `Total Bolus: ${totalBolus.toFixed(2)} units\nRounded Total Bolus: ${roundedBolus.toFixed(1)} units`;
