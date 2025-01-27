@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerson's Bolus Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Emerson's Bolus Calculator</h1>
+        <div class="form-group">
+            <label for="currentBG">Current BG (mg/dL)</label>
+            <input type="number" id="currentBG" min="0" max="800" required>
+        </div>
+        <div class="form-group">
+            <label for="carbs">Carbs in Meal (grams)</label>
+            <input type="number" id="carbs" min="0" required>
+        </div>
+        <div class="form-group">
+            <label for="targetBG">Target BG</label>
+            <select id="targetBG">
+                <option value="120">Normal (120 mg/dL)</option>
+                <option value="170">Pre-Sport (170 mg/dL)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cf">Correction Factor (CF)</label>
+            <select id="cf">
+                <script>
+                    for (let i = 0; i <= 200; i += 10) {
+                        document.write(`<option value="${i}" ${i === 100 ? 'selected' : ''}>${i}</option>`);
+                    }
+                </script>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="icr">Insulin-to-Carb Ratio (ICR)</label>
+            <select id="icr">
+                <script>
+                    for (let i = 5; i <= 60; i += 1) {
+                        document.write(`<option value="${i}" ${i === 22 ? 'selected' : ''}>${i}</option>`);
+                    }
+                </script>
+            </select>
+        </div>
+        <button onclick="calculateBolus()">Calculate Bolus</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculateBolus() {
+            const currentBG = parseFloat(document.getElementById('currentBG').value);
+            const carbs = parseFloat(document.getElementById('carbs').value);
+            const targetBG = parseFloat(document.getElementById('targetBG').value);
+            const cf = parseFloat(document.getElementById('cf').value);
+            const icr = parseFloat(document.getElementById('icr').value);
+
+            if (isNaN(currentBG) || isNaN(carbs)) {
+                document.getElementById('result').innerText = 'Please enter valid values for Current BG and Carbs.';
+                return;
+            }
+
+            const carbBolus = carbs / icr;
+            const correctionBolus = cf > 0 ? (currentBG - targetBG) / cf : 0;
+            const totalBolus = carbBolus + correctionBolus;
+            const roundedBolus = Math.round(totalBolus * 2) / 2;
+
+            document.getElementById('result').innerText = `Total Bolus: ${totalBolus.toFixed(2)} units\nRounded Total Bolus: ${roundedBolus.toFixed(1)} units`;
+        }
+    </script>
+</body>
+</html>
