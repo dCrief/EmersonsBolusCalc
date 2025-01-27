@@ -112,7 +112,11 @@
             const totalBolus = carbBolus + correctionBolus;
             const roundedBolus = Math.round(totalBolus * 2) / 2;
 
-            document.getElementById('result').innerText = `Total Bolus: ${totalBolus.toFixed(2)} units\nRounded Total Bolus: ${roundedBolus.toFixed(1)} units`;
+            if ((totalBolus <= 0) && (currentBG <= 70)) {
+                document.getElementById('result').innerText = 'NO BOLUS NEEDED. EAT CARBS IMMEDIATELY!';
+            } else {
+                document.getElementById('result').innerText = `Total Bolus: ${totalBolus.toFixed(2)} units\nRounded Total Bolus: ${roundedBolus.toFixed(1)} units`;
+            }
         }
     </script>
 </body>
