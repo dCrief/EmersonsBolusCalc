@@ -30,11 +30,12 @@
             margin-bottom: 5px;
         }
         input, select, button {
-            width: 100%;
+            width: calc(100% - 20px); /* Ensure consistent width */
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            margin: auto;
         }
         button {
             background-color: #007bff;
@@ -49,6 +50,16 @@
             font-size: 18px;
             font-weight: bold;
             text-align: center;
+        }
+        .calculations {
+            display: none;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -98,6 +109,8 @@
         </div>
         <button onclick="calculateBolus()">Calculate Bolus</button>
         <div class="result" id="result"></div>
+        <a href="#" onclick="toggleCalculations()" style="display:block; text-align:center; margin-top:15px; font-size:14px;">Show me the Math</a>
+        <div class="calculations" id="calculations"></div>
     </div>
 
     <script>
@@ -113,15 +126,30 @@
                 return;
             }
 
+            // Calculate the Boluses
             const carbBolus = carbs / icr;
             const correctionBolus = cf > 0 ? (currentBloodGlucose - targetBloodGlucose) / cf : 0;
             const totalBolus = carbBolus + correctionBolus;
             const roundedBolus = Math.round(totalBolus * 2) / 2;
 
-            if ((totalBolus <= 0) && (currentBloodGlucose <= 70)) {
-                document.getElementById('result').innerText = 'NO BOLUS NEEDED. EAT CARBS IMMEDIATELY!';
+            // Display the result
+            if (roundedBolus <= 0) {
+                document.getElementById('result').innerText = 'No insulin bolus is needed.';
             } else {
                 document.getElementById('result').innerText = `Total Bolus: ${totalBolus.toFixed(2)} units\nRounded Total Bolus: ${roundedBolus.toFixed(1)} units`;
+            }
+
+            // Show the calculations
+            const calculations = `Carb Bolus Calculation: (Carbs in Meal / ICR) = (${carbs} / ${icr}) = ${carbBolus.toFixed(2)} units\n\nCorrection Bolus Calculation: (Current Blood Glucose - Target Blood Glucose) / CF = (${currentBloodGlucose} - ${targetBloodGlucose}) / ${cf} = ${correctionBolus.toFixed(2)} units\n\nTotal Bolus: ${totalBolus.toFixed(2)} units\nRounded Total Bolus: ${roundedBolus.toFixed(1)} units`;
+            document.getElementById('calculations').innerText = calculations;
+        }
+
+        function toggleCalculations() {
+            const calculationsDiv = document.getElementById('calculations');
+            if (calculationsDiv.style.display === 'none' || calculationsDiv.style.display === '') {
+                calculationsDiv.style.display = 'block';
+            } else {
+                calculationsDiv.style.display = 'none';
             }
         }
     </script>
